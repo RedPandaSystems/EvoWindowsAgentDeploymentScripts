@@ -59,6 +59,18 @@
 .PARAMETER UACExtension
     Optional setting to enable UAC extension (0=disabled, 1=enabled, other credential providers available in UAC dialog, 2=enabled, Evo exclusive in UAC dialog )
 
+.PARAMETER DisableEvoLogin
+    Optional setting to disable the Evo credential on the login screen
+
+.PARAMETER DisableEvoUac
+    Optional setting to disable the Evo credential in the UAC dialog
+
+.PARAMETER UnlimitedExtendedUacSession
+    Optional setting to enable unlimited extended UAC session
+
+.PARAMETER PersistentRequest
+    Optional setting to enable persistent elevation request notifications instead of having a 10 second timeout
+
 .PARAMETER MSIPath
     Optional path to a .msi or .zip file. If omitted, the latest version is downloaded.
 
@@ -137,6 +149,18 @@ param(
 
     [Parameter(ParameterSetName='CommandLineConfig')]
     [Nullable[int]] [ValidateSet(0, 1, 2)] $UACExtension,
+
+    [Parameter(ParameterSetName='CommandLineConfig')]
+    [Nullable[int]] [ValidateSet(0, 1)] $DisableEvoLogin,
+
+    [Parameter(ParameterSetName='CommandLineConfig')]
+    [Nullable[int]] [ValidateSet(0, 1)] $DisableEvoUac,
+
+    [Parameter(ParameterSetName='CommandLineConfig')]
+    [Nullable[int]] [ValidateSet(0, 1)] $UnlimitedExtendedUacSession,
+
+    [Parameter(ParameterSetName='CommandLineConfig')]
+    [Nullable[int]] [ValidateSet(0, 1)] $PersistentRequest,
 
     [Parameter(ParameterSetName='CommandLineConfig', HelpMessage='Leave blank to download latest. Otherwise path to MSI or zip file to install')]
     [string] $MSIPath,
@@ -219,6 +243,10 @@ Parameters:
   -CustomImage            Optional path to a custom login prompt image
   -NoElevatedRDP          Optional flag to disable elevation for RDP sessions when Evo is the sole login agent (defaults on or value of previous install)
   -UACExtension           Optional setting to enable UAC extension (0=disabled, 1=enabled, other credential providers available in UAC dialog, 2=enabled, Evo exclusive in UAC dialog ) (defaults disabled or value of previous install)
+  -DisableEvoLogin        Optional setting to disable the Evo credential on the login screen (defaults off or value of previous install)
+  -DisableEvoUac          Optional setting to disable the Evo credential in the UAC dialog (defaults off or value of previous install)
+  -UnlimitedExtendedUacSession Optional setting to enable unlimited extended UAC session (defaults off or value of previous install)
+  -PersistentRequest      Optional setting to enable persistent elevation request notifications instead of having a 10 second timeout (defaults off or value of previous install)
   -MSIPath                Optional .msi or .zip file path
   -Upgrade                Validate version is newer before installing
   -Remove                 Uninstall agent
@@ -600,6 +628,34 @@ function ParamMapFromJson {
         $ParamMap["UAC_EXTENSION"] = 2
     }
 
+    if ($config.DisableEvoLogin -eq 1) {
+        $ParamMap["DISABLE_EVO_LOGIN"] = 1
+    }
+    elseif ($config.DisableEvoLogin -eq 0) {
+        $ParamMap["DISABLE_EVO_LOGIN"] = 0
+    }
+
+    if ($config.DisableEvoUac -eq 1) {
+        $ParamMap["DISABLE_EVO_UAC"] = 1
+    }
+    elseif ($config.DisableEvoUac -eq 0) {
+        $ParamMap["DISABLE_EVO_UAC"] = 0
+    }
+
+    if ($config.UnlimitedExtendedUacSession -eq 1) {
+        $ParamMap["UNLIMITED_EXTENDED_UAC_SESSION"] = 1
+    }
+    elseif ($config.UnlimitedExtendedUacSession -eq 0) {
+        $ParamMap["UNLIMITED_EXTENDED_UAC_SESSION"] = 0
+    }
+
+    if ($config.PersistentRequest -eq 1) {
+        $ParamMap["PERSISTENT_REQUEST"] = 1
+    }
+    elseif ($config.PersistentRequest -eq 0) {
+        $ParamMap["PERSISTENT_REQUEST"] = 0
+    }
+
     # trim string values in ParamMap
     foreach ($key in $ParamMap.Keys.Clone()) {
         $val = $ParamMap[$key]
@@ -802,7 +858,7 @@ function Get-MSIVersion {
         
         # Query the Property table for ProductVersion
         $view = $database.OpenView("SELECT Value FROM Property WHERE Property = 'ProductVersion'")
-        $view.Execute()
+        $view.Execute() | Out-Null
         
         # Fetch the result
         $record = $view.Fetch()
@@ -995,6 +1051,18 @@ if (-not $Json) {
     }
     if ($null -ne $UACExtension) {
         $MapForJson += @{ UACExtension = $UACExtension}
+    }
+    if ($null -ne $DisableEvoLogin) {
+        $MapForJson += @{ DisableEvoLogin = $DisableEvoLogin}
+    }
+    if ($null -ne $DisableEvoUac) {
+        $MapForJson += @{ DisableEvoUac = $DisableEvoUac}
+    }
+    if ($null -ne $UnlimitedExtendedUacSession) {
+        $MapForJson += @{ UnlimitedExtendedUacSession = $UnlimitedExtendedUacSession}
+    }
+    if ($null -ne $PersistentRequest) {
+        $MapForJson += @{ PersistentRequest = $PersistentRequest}
     }
     if ($MSIPath) {
         $MapForJson += @{ MSIPath = $MSIPath}
