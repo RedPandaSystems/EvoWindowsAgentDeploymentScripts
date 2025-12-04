@@ -39,7 +39,7 @@ This repository contains PowerShell scripts to install, upgrade, or remove the *
 ---
 
 ## 🔧 Parameters
-
+Minimum supported Agent version for any option is 2.3 unless indicated otherwise
 | Parameter                 | Description                                                                                                                                                   | Default                |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
 | `-EnvironmentUrl`         | Evo portal base URL (e.g., `https://yourorg.evosecurity.com`)                                                                                                 |                        |
@@ -56,13 +56,13 @@ This repository contains PowerShell scripts to install, upgrade, or remove the *
 | `-EndUserElevation`       | Optional flag to enable end-user elevation                                                                                                                    | 0                      |
 | `-UserAdminEscalation`    | Optional flag to prompt admins with the end-user elevation prompt instead of the standard UAC prompt                                                          | 0                      |
 | `-CustomPrompt`           | Optional string to customize the login prompt                                                                                                                 |                        |
-| `-CustomImage`            | Optional path to custom login image (URL or local file path)                                                                                                   |                        |
+| `-CustomImage`            | Optional path to custom login image (URL or local file path)                                                                                                  |                        |
 | `-NoElevatedRDP`          | Optional flag to disable elevation for RDP sessions when Evo is the sole login agent                                                                          | 1                      |
 | `-UACExtension`           | Optional setting to enable UAC extension (0=disabled, 1=enabled, other credential providers available in UAC dialog, 2=enabled, Evo exclusive in UAC dialog ) | 0                      |
-| `-DisableEvoLogin`        | Optional setting to disable the Evo credential on the login screen                                                                                             | 0                      |
-| `-DisableEvoUac`          | Optional setting to disable the Evo credential in the UAC dialog                                                                                               | 0                      |
-| `-UnlimitedExtendedUacSession`  | Optional setting to enable unlimited extended UAC session                                                                                                | 0                      |
-| `-PersistentRequest`      | Optional setting to enable persistent elevation request notifications instead of having a 10 second timeout                                                              | 0                      |
+| `-DisableEvoLogin`        | Optional setting to disable the Evo credential on the login screen (Minumum supported agent = 2.4)                                                            | 0                      |
+| `-DisableEvoUac`          | Optional setting to disable the Evo credential in the UAC dialog (Minumum supported agent = 2.4)                                                              | 0                      |
+| `-UnlimitedExtendedUacSession`  | Optional setting to enable unlimited extended UAC session  (Minumum supported agent = 2.4)                                                              | 0                      |
+| `-PersistentRequest`      | Optional setting to enable persistent elevation request notifications instead of having a 10 second timeout (Minumum supported agent = 2.4)                   | 0                      |
 | `-MSIPath`                | Optional path to `.msi` or `.zip` file                                                                                                                        |                        |
 | `-Upgrade`                | Ensure only newer versions replace installed ones                                                                                                             |                        |
 | `-Remove`                 | Uninstalls the Evo Credential Provider                                                                                                                        |                        |
