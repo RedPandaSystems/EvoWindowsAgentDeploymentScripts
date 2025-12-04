@@ -243,10 +243,10 @@ Parameters:
   -CustomImage            Optional path to a custom login prompt image
   -NoElevatedRDP          Optional flag to disable elevation for RDP sessions when Evo is the sole login agent (defaults on or value of previous install)
   -UACExtension           Optional setting to enable UAC extension (0=disabled, 1=enabled, other credential providers available in UAC dialog, 2=enabled, Evo exclusive in UAC dialog ) (defaults disabled or value of previous install)
-  -DisableEvoLogin        Optional setting to disable the Evo credential on the login screen (defaults off or value of previous install, minumum supported agent = 2.4)
-  -DisableEvoUac          Optional setting to disable the Evo credential in the UAC dialog (defaults off or value of previous install, minumum supported agent = 2.4)
-  -UnlimitedExtendedUacSession Optional setting to enable unlimited extended UAC session (defaults off or value of previous install, minumum supported agent = 2.4)
-  -PersistentRequest      Optional setting to enable persistent elevation request notifications instead of having a 10 second timeout (defaults off or value of previous install, minumum supported agent = 2.4)
+  -DisableEvoLogin        Optional setting to disable the Evo credential on the login screen (defaults off or value of previous install, minimum supported agent = 2.4)
+  -DisableEvoUac          Optional setting to disable the Evo credential in the UAC dialog (defaults off or value of previous install, minimum supported agent = 2.4)
+  -UnlimitedExtendedUacSession Optional setting to enable unlimited extended UAC session (defaults off or value of previous install, minimum supported agent = 2.4)
+  -PersistentRequest      Optional setting to enable persistent elevation request notifications instead of having a 10 second timeout (defaults off or value of previous install, minimum supported agent = 2.4)
   -MSIPath                Optional .msi or .zip file path
   -Upgrade                Validate version is newer before installing
   -Remove                 Uninstall agent
