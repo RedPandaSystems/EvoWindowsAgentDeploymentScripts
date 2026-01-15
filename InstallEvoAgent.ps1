@@ -6,6 +6,9 @@
     This script installs, upgrades, or removes the Evo Windows Agent on a Windows machine.
     It can be used interactively or in silent mode with command-line parameters.
 
+.PARAMETER DeploymentToken
+    The deployment token from the Evo Admin portal
+
 .PARAMETER EnvironmentUrl
     The Evo environment URL (e.g. https://yourorg.evosecurity.com)
 
@@ -104,6 +107,9 @@ param(
     [Parameter(ParameterSetName='JsonConfig')]
     [string] $Json,
 
+    [Parameter(ParameterSetName='DeploymentTokenConfig')]
+    [string] $DeploymentToken,
+
     [Parameter(ParameterSetName='CommandLineConfig')]
     [string] $EnvironmentUrl,
 
@@ -116,6 +122,7 @@ param(
     [Parameter(ParameterSetName='CommandLineConfig')]
     [string] $Secret,
 
+    [Parameter(ParameterSetName='DeploymentTokenConfig')]
     [Parameter(ParameterSetName='CommandLineConfig')]
     [string] $FailSafeUser,
 
@@ -162,19 +169,24 @@ param(
     [Parameter(ParameterSetName='CommandLineConfig')]
     [Nullable[int]] [ValidateSet(0, 1)] $PersistentRequest,
 
+    [Parameter(ParameterSetName='DeploymentTokenConfig')]
     [Parameter(ParameterSetName='CommandLineConfig', HelpMessage='Leave blank to download latest. Otherwise path to MSI or zip file to install')]
     [string] $MSIPath,
 
+    [Parameter(ParameterSetName='DeploymentTokenConfig')]
     [Parameter(ParameterSetName='JsonConfig')]
     [Parameter(ParameterSetName='CommandLineConfig', DontShow=$true)]
     [hashtable] $Dictionary,
 	
+    [Parameter(ParameterSetName='DeploymentTokenConfig')]
     [Parameter(ParameterSetName='CommandLineConfig')]
 	[string] $CustomPrompt,
 	
+    [Parameter(ParameterSetName='DeploymentTokenConfig')]
     [Parameter(ParameterSetName='CommandLineConfig')]
 	[string] $CustomImage,
 
+    [Parameter(ParameterSetName='DeploymentTokenConfig')]
     [Parameter(ParameterSetName='JsonConfig')]
     [Parameter(ParameterSetName='CommandLineConfig')]
     [switch] $Beta,
@@ -182,15 +194,18 @@ param(
     [Parameter(ParameterSetName='RemoveConfig')]
     [switch] $Remove,
 
+    [Parameter(ParameterSetName='DeploymentTokenConfig')]
     [Parameter(ParameterSetName='JsonConfig')]
     [Parameter(ParameterSetName='CommandLineConfig')]
     [switch] $Upgrade,
 
+    [Parameter(ParameterSetName='DeploymentTokenConfig')]
     [Parameter(ParameterSetName='JsonConfig')]
     [Parameter(ParameterSetName='CommandLineConfig')]
     [Parameter(ParameterSetName='RemoveConfig')]
     [switch] $Interactive,
 
+    [Parameter(ParameterSetName='DeploymentTokenConfig')]
     [Parameter(ParameterSetName='JsonConfig')]
     [Parameter(ParameterSetName='CommandLineConfig')]
     [Parameter(ParameterSetName='RemoveConfig')]
@@ -209,7 +224,10 @@ This script installs, upgrades, or removes the Evo Windows Agent.
 
 Usage Examples:
 ---------------
-  Install:
+  Install with deployment token (preferred since version 2.5):
+    .\InstallEvoAgent.ps1 -DeploymentToken "abc123"
+
+  Install using old parameters:
     .\InstallEvoAgent.ps1 -EnvironmentUrl "https://myorg.evosecurity.com" -EvoDirectory "MyOrg" -AccessToken "abc123" -Secret "xyz789"
 
   Install with logging and upgrade (uses existing settings):
@@ -226,6 +244,7 @@ Usage Examples:
 
 Parameters:
 -----------
+  -DeploymentToken        Deployment token (preferred method since version 2.5)
   -EnvironmentUrl         Evo environment URL
   -EvoDirectory           Organization/tenant name
   -AccessToken            API token
@@ -260,7 +279,7 @@ Notes:
 ------
   - Requires elevation (admin) unless using -Interactive
   - You can also pass a legacy JSON config via -Json
-  - For a new install, the only required values are -EnvironmentUrl, -EvoDirectory, -AccessToken, and -Secret (or those values in the -Json payload)
+  - For a new install, the only required values are -DeploymentToken, or if not using Deployment Token then -EnvironmentUrl, -EvoDirectory, -AccessToken, and -Secret (or those values in the -Json payload)
   - For an upgrade, the installer will inherit all the values from the previous install unless specified otherwise
 "@ | Write-Host
     exit
@@ -477,6 +496,11 @@ function CredProParamMapFromConfig {
             throw # this way gives a better indication of where the problem is
         }
     }
+
+    if ($config.DeploymentToken) {
+        $ParamMap["DEPLOYMENT_TOKEN_VALUE"] = $config.DeploymentToken
+    }
+
     if ($config.EnvironmentUrl) {
         $EnvUrl = $config.EnvironmentUrl.Trim("/ ")  # cleans up environment url
         $ParamMap["ENVIRONMENTURL"] = $EnvUrl
@@ -999,6 +1023,9 @@ if (-not $Json) {
     # Write-Verbose "Parameters: EnvironmentUrl=$EnvironmentUrl; EvoDirectory=$EvoDirectory; Secret=$Secret; AccessToken=$AccessToken"
     $MapForJson = @{}
 
+    if ($DeploymentToken) {
+        $MapForJson += @{ DeploymentToken = $DeploymentToken}
+    }
     if ($EnvironmentUrl) {
         $MapForJson += @{ EnvironmentUrl = $EnvironmentUrl}
     }

@@ -40,8 +40,10 @@ This repository contains PowerShell scripts to install, upgrade, or remove the *
 
 ## 🔧 Parameters
 Minimum supported Agent version for any option is 2.3 unless indicated otherwise
+
 | Parameter                 | Description                                                                                                                                                   | Default                |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
+| `-DeploymentToken`        | Deployment token from portal (Minimum supported agent = 2.5. Now the preferred method)                                                                        |                        |
 | `-EnvironmentUrl`         | Evo portal base URL (e.g., `https://yourorg.evosecurity.com`)                                                                                                 |                        |
 | `-EvoDirectory`           | Your Evo organization/directory name                                                                                                                          |                        |
 | `-AccessToken`            | Evo API access token                                                                                                                                          |                        |
@@ -72,14 +74,21 @@ Minimum supported Agent version for any option is 2.3 unless indicated otherwise
 | `-Json`                   | Legacy option to supply a JSON config blob or file                                                                                                            |                        |
 | `-Help`                   | Displays built-in help text                                                                                                                                   |                        |
 
-`-EnvironmentUrl`, `-EvoDirectory`, `-AccessToken`, and `-Secret` parameters are required except on upgrades or removal.  
+`-DeploymentToken` is only required parameter except on upgrades or removal
+If using install not using deployment token, `-EnvironmentUrl`, `-EvoDirectory`, `-AccessToken`, and `-Secret` parameters are required
 When upgrading, any unspecified parameters are inherited from the previous install.
 
 ---
 
 ## 🚀 Example Usages
 
-### Basic Install
+### Install with deployment token (preferred with agent 2.5+)
+
+```powershell
+.\InstallEvoAgent.ps1 -DeploymentToken "deptoken123abc"
+```
+
+### Basic Install (still supported)
 
 ```powershell
 .\InstallEvoAgent.ps1 -EnvironmentUrl "https://myorg.evosecurity.com" -EvoDirectory "MyOrg" -AccessToken "abc123" -Secret "xyz789"
