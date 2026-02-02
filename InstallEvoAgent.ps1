@@ -1009,6 +1009,48 @@ if ($Remove) {
     return DoRemoveAgent $Interactive $Log
 }
 
+# Auto-detect DeploymentToken from NinjaOne based on OS type if not provided
+if (-not $DeploymentToken) {
+    Write-Verbose "DeploymentToken not provided, attempting to detect from NinjaOne environment variables"
+    
+    # Detect if system is a workstation or server
+    # ProductType: 1 = Workstation, 2 = Domain Controller, 3 = Server
+    $osInfo = Get-CimInstance -ClassName Win32_OperatingSystem
+    $productType = $osInfo.ProductType
+    
+    Write-Output "OS Detection: ProductType = $productType (1=Workstation, 2=DC, 3=Server)"
+    
+    if ($productType -eq 1) {
+        # Workstation
+        Write-Output "Detected Workstation OS - Looking for evoworkstationinstalltoken"
+        $ninjaToken = ninja-Property-get evoworkstationinstalltoken
+        if ($ninjaToken) {
+            Write-Output "Found evoworkstationinstalltoken from NinjaOne"
+            $DeploymentToken = $ninjaToken
+        } else {
+            Write-Output "evoworkstationinstalltoken environment variable not found"
+        }
+    } elseif ($productType -in 2, 3) {
+        # Server or Domain Controller
+        Write-Output "Detected Server OS (ProductType: $productType) - Looking for evoserverinstalltoken"
+        $ninjaToken = ninja-Property-get evoserverinstalltoken
+        if ($ninjaToken) {
+            Write-Output "Found evoserverinstalltoken from NinjaOne"
+            $DeploymentToken = $ninjaToken
+        } else {
+            Write-Output "evoserverinstalltoken environment variable not found"
+            Write-Output "Available environment variables starting with 'Evo': $((Get-ChildItem env: | Where-Object { $_.Name -like 'Evo*' } | ForEach-Object { $_.Name }) -join ', ')"
+        }
+    } else {
+        Write-Warning "Unknown OS ProductType: $productType"
+    }
+    
+    # If DeploymentToken still not set after auto-detection attempt, exit with error
+    if (-not $DeploymentToken) {
+        throw "Error: DeploymentToken not specified and could not be auto-detected from NinjaOne environment variables. Please provide a DeploymentToken or ensure the appropriate NinjaOne custom field (evoworkstationinstalltoken or evoserverinstalltoken) is set."
+    }
+}
+
 $InstalledVersion = GetInstalledVersion
 Write-Verbose "Installed version: $InstalledVersion"
 
